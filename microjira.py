@@ -11,25 +11,18 @@ reload(sys)
 sys.setdefaultencoding('utf8')
 
 def jql_builder(text, projects=None, upto_date=None):
-
-	print 'text%20~%20\"' + text + '\"'
 	return 'text%20~%20\"' + text + '\"' 
 
 def url_builder(host, query):
-
  	search_call = '/rest/api/2/search?jql='
 
  	if host.endswith('/'):
- 		print host[:-1] + search_call + query
  		return host[:-1] + search_call + query
- 	else:
- 		print host + search_call + query
- 		return host + search_call + query
+ 	return host + search_call + query
 
 # This function cannot handle authentication over a proxy server.
 # url is your jira server url/IP
 def api_request(username, password, url):
-    
     # basic authentication handler
 	try:
 	    request = urllib2.Request(url)
