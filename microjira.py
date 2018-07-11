@@ -5,23 +5,47 @@ import base64
 import json
 
 # JQL cannot handle non-unicode characters.
-# The following 3 lines standardise it.
+# The following 3 lines standardise it (not needed in python3)
 import sys
 reload(sys)
 sys.setdefaultencoding('utf8')
 
+def jql_builder(text, projects=None, upto_date=None):
+
+	print 'text%20~%20\"' + text + '\"'
+	return 'text%20~%20\"' + text + '\"' 
+
+def url_builder(host, query):
+
+ 	search_call = '/rest/api/2/search?jql='
+
+ 	if host.endswith('/'):
+ 		print host[:-1] + search_call + query
+ 		return host[:-1] + search_call + query
+ 	else:
+ 		print host + search_call + query
+ 		return host + search_call + query
+
 # This function cannot handle authentication over a proxy server.
-# server is your jira server url/IP
-def jira_authenticator(username, password, server):
+# url is your jira server url/IP
+def api_request(username, password, url):
     
-    # Basic authentication handler
-    b64auth = base64.standard_b64encode("%s:%s" % (username, password))
-    request.add_header("Authorization", "Basic %s" % b64auth)
+    # basic authentication handler
+	try:
+	    request = urllib2.Request(url)
+	    print request
+	except NameError as e:
+	    print 'Invalid JQL query.'
+	    exit()
 
-    try:
-        request = urllib2.Request(server)
-    except urllib2.HTTPError as e:
-        print 'Jira authentication failed. Please review the credentials supplied.'
-        exit()
+	# auth handler
+	b64auth = base64.standard_b64encode("%s:%s" % (username, password))
+	request.add_header("Authorization", "Basic %s" % b64auth)
 
-    return True
+	try:
+		result = urllib2.urlopen(request)
+	except urllib2.HTTPError as e:
+		print 'Bad request: please review the credentials supplied.'
+		exit()
+	
+	return json.loads(result.read())
